@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PAI — панель управления отделом</title>
+<link rel="stylesheet" href="/assets/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div id="login-screen" class="login-screen">
+  <div class="login-card">
+    <div class="login-badge">PAI</div>
+    <h1>Панель отдела</h1>
+    <p class="muted">Введите пароль для доступа к CRM</p>
+    <form id="login-form">
+      <input type="password" id="login-password" placeholder="Пароль" autocomplete="current-password" required>
+      <button type="submit">Войти</button>
+    </form>
+    <p id="login-error" class="error-text"></p>
+  </div>
+</div>
+
+<div id="app" class="app hidden">
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-mark">PAI</span>
+      <span class="brand-sub">Отдел · CRM</span>
+    </div>
+    <nav class="nav">
+      <button class="nav-item active" data-view="roster">Состав</button>
+      <button class="nav-item" data-view="points">Баллы — настройка</button>
+      <button class="nav-item" data-view="reports">Отчёты</button>
+      <button class="nav-item" data-view="summary">Сводка активности</button>
+      <button class="nav-item" data-view="warnings">Выговоры</button>
+      <button class="nav-item" data-view="norms">Дневная норма</button>
+      <button class="nav-item" data-view="events">События</button>
+    </nav>
+    <button id="logout-btn" class="logout-btn">Выйти</button>
+  </aside>
+
+  <main class="content">
+
+    <!-- СОСТАВ -->
+    <section id="view-roster" class="view active">
+      <header class="view-header">
+        <div>
+          <span class="eyebrow">01 — Личный состав</span>
+          <h2>Состав отдела</h2>
+        </div>
+        <button class="btn-primary" data-open-modal="modal-member">+ Добавить сотрудника</button>
+      </header>
+      <div id="roster-groups" class="roster-groups"></div>
+    </section>
+
+    <!-- БАЛЛЫ -->
+    <section id="view-points" class="view">
+      <header class="view-header">
+        <div>
+          <span class="eyebrow">02 — Настройка</span>
+          <h2>Виды работ и баллы</h2>
+        </div>
+        <button class="btn-primary" data-open-modal="modal-point">+ Добавить вид работы</button>
+      </header>
+      <table class="data-table">
+        <thead><tr><th>Название работы</th><th>Баллы</th><th></th></tr></thead>
+        <tbody id="points-tbody"></tbody>
+      </table>
+    </section>
+
+    <!-- ОТЧЁТЫ -->
+    <section id="view-reports" class="view">
+      <header class="view-header">
+        <div>
+          <span class="eyebrow">03 — Еженедельно</span>
+          <h2>Отчёты</h2>
+        </div>
+        <div class="week-picker">
+          <button id="reports-week-prev">←</button>
+          <span id="reports-week-label"></span>
+          <button id="reports-week-next">→</button>
+          <button class="btn-primary" data-open-modal="modal-report">+ Внести отчёт</button>
+        </div>
+      </header>
+      <div id="reports-list" class="cards-list"></div>
+    </section>
+
+    <!-- СВОДКА -->
+    <section id="view-summary" class="view">
+      <header class="view-header">
+        <div>
+          <span class="eyebrow">04 — Аналитика</span>
+          <h2>Сводка активности по отчётам</h2>
+        </div>
+        <div class="week-picker">
+          <button id="summary-week-prev">←</button>
+          <span id="summary-week-label"></span>
+          <button id="summary-week-next">→</button>
+        </div>
+      </header>
+      <div class="summary-stats" id="summary-stats"></div>
+      <table class="data-table">
+        <thead><tr><th>Сотрудник</th><th>Должность</th><th>Статус</th><th>Баллы</th></tr></thead>
+        <tbody id="summary-tbody"></tbody>
+      </table>
+    </section>
+
+    <!-- ВЫГОВОРЫ -->
+    <section id="view-warnings" class="view">
+      <header class="view-header">
+        <div>
+          <span class="eyebrow">05 — Дисциплина</span>
+          <h2>Выговоры</h2>
+        </div>
+        <button class="btn-primary" data-open-modal="modal-warning">+ Выдать выговор</button>
+      </header>
+      <table class="data-table">
+        <thead><tr><th>Сотрудник</th><th>Уровень</th><th>Причина</th><th>Кем выдан</th><th>Дата</th><th></th></tr></thead>
+        <tbody id="warnings-tbody"></tbody>
+      </table>
+    </section>
+
+    <!-- НОРМА -->
+    <section id="view-norms" class="view">
+      <header class="view-header">
+        <div>
+          <span class="eyebrow">06 — Ежедневно</span>
+          <h2>Норма: час в холле + гос. волна</h2>
+        </div>
+        <div class="week-picker">
+          <label class="muted" style="margin-right:8px">Дней:</label>
+          <select id="norms-range">
+            <option value="7">7</option>
+            <option value="14">14</option>
+            <option value="30">30</option>
+          </select>
+        </div>
+      </header>
+      <div class="table-scroll">
+        <table class="data-table norms-table" id="norms-table"></table>
+      </div>
+    </section>
+
+    <!-- СОБЫТИЯ -->
+    <section id="view-events" class="view">
+      <header class="view-header">
+        <div>
+          <span class="eyebrow">07 — Собрания</span>
+          <h2>События</h2>
+        </div>
+        <button class="btn-primary" data-open-modal="modal-event">+ Создать событие</button>
+      </header>
+      <div id="events-list" class="cards-list"></div>
+    </section>
+
+  </main>
+</div>
+
+<!-- МОДАЛКИ -->
+<div class="modal-backdrop" id="modal-member">
+  <div class="modal">
+    <h3>Добавить сотрудника</h3>
+    <form id="form-member">
+      <label>Имя<input name="first_name" required></label>
+      <label>Фамилия<input name="last_name" required></label>
+      <label>Static ID<input name="static_id" required></label>
+      <label>Должность<select name="position" id="member-position-select" required></select></label>
+      <label>Discord ID <span class="muted">(необязательно)</span><input name="discord_id" type="text" placeholder="123456789012345678"></label>
+      <div class="modal-actions">
+        <button type="button" class="btn-ghost" data-close-modal>Отмена</button>
+        <button type="submit" class="btn-primary">Добавить</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-point">
+  <div class="modal">
+    <h3>Добавить вид работы</h3>
+    <form id="form-point">
+      <label>Название<input name="title" required></label>
+      <label>Баллы за единицу<input name="points" type="number" required></label>
+      <div class="modal-actions">
+        <button type="button" class="btn-ghost" data-close-modal>Отмена</button>
+        <button type="submit" class="btn-primary">Добавить</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-report">
+  <div class="modal">
+    <h3>Внести еженедельный отчёт</h3>
+    <form id="form-report">
+      <label>Сотрудник<select name="member_id" id="report-member-select" required></select></label>
+      <label>Текст отчёта<textarea name="content" rows="3"></textarea></label>
+      <div id="report-items"></div>
+      <button type="button" class="btn-ghost" id="report-add-item">+ Добавить строку работы</button>
+      <div class="modal-actions">
+        <button type="button" class="btn-ghost" data-close-modal>Отмена</button>
+        <button type="submit" class="btn-primary">Сохранить отчёт</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-warning">
+  <div class="modal">
+    <h3>Выдать выговор</h3>
+    <form id="form-warning">
+      <label>Сотрудник<select name="member_id" id="warning-member-select" required></select></label>
+      <label>Уровень<select name="level" id="warning-level-select" required></select></label>
+      <label>Причина<textarea name="reason" rows="3" required></textarea></label>
+      <div class="modal-actions">
+        <button type="button" class="btn-ghost" data-close-modal>Отмена</button>
+        <button type="submit" class="btn-primary">Выдать</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-event">
+  <div class="modal">
+    <h3>Создать событие</h3>
+    <form id="form-event">
+      <label>Название<input name="title" required></label>
+      <label>Дата и время<input name="event_datetime" type="datetime-local" required></label>
+      <label>Описание<textarea name="description" rows="2"></textarea></label>
+      <div class="modal-actions">
+        <button type="button" class="btn-ghost" data-close-modal>Отмена</button>
+        <button type="submit" class="btn-primary">Создать</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-event-detail">
+  <div class="modal modal-wide">
+    <h3 id="event-detail-title">Событие</h3>
+    <p class="muted" id="event-detail-meta"></p>
+    <div id="event-detail-attendance" class="attendance-list"></div>
+    <div class="modal-actions">
+      <button type="button" class="btn-ghost" data-close-modal>Закрыть</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script src="/assets/app.js"></script>
+</body>
+</html>
