@@ -5,6 +5,10 @@ from __future__ import annotations
 
 import datetime as dt
 import itsdangerous
+import os
+from pathlib import Path
+import datetime as dt
+import itsdangerous
 from pathlib import Path
 from typing import Optional
 
@@ -437,4 +441,5 @@ if __name__ == "__main__":
 
     from core.config import WEB_HOST, WEB_PORT
 
-    uvicorn.run("web.main:app", host=WEB_HOST, port=WEB_PORT, reload=True)
+        dev_reload = os.getenv("DEV_RELOAD", "0") == "1"
+    uvicorn.run("web.main:app", host=WEB_HOST, port=WEB_PORT, reload=dev_reload)
