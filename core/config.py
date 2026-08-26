@@ -14,6 +14,7 @@ ADMIN_ROLE_IDS = {
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./pai_crm.db")
 
 WEB_HOST = os.getenv("WEB_HOST", "0.0.0.0")
-WEB_PORT = int(os.getenv("WEB_PORT", "8000"))
+# Railway сам назначает порт через переменную PORT — используем её, если она есть
+WEB_PORT = int(os.getenv("PORT") or os.getenv("WEB_PORT", "8000"))
 WEB_ADMIN_PASSWORD = os.getenv("WEB_ADMIN_PASSWORD", "change_me")
 WEB_SECRET_KEY = os.getenv("WEB_SECRET_KEY", "change_me_too")
