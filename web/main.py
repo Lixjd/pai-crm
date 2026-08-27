@@ -441,5 +441,9 @@ if __name__ == "__main__":
 
     from core.config import WEB_HOST, WEB_PORT
 
-        dev_reload = os.getenv("DEV_RELOAD", "0") == "1"
+    # reload=True удобен только при локальной разработке. На хостинге (Railway и т.п.)
+    # он следит за изменениями файлов и может уйти в цикл перезапуска, когда
+    # рядом создаётся/меняется файл базы данных pai_crm.db — поэтому включаем его
+    # только если явно попросили через переменную окружения DEV_RELOAD=1.
+    dev_reload = os.getenv("DEV_RELOAD", "0") == "1"
     uvicorn.run("web.main:app", host=WEB_HOST, port=WEB_PORT, reload=dev_reload)
